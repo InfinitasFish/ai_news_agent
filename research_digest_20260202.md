@@ -6,29 +6,6 @@
 
 
 
-Paper: Training-Free Test-Time Adaptation with Brownian Distance Covariance in Vision-Language Models
-
-Authors: Yi Zhang, Chun-Wun Cheng, Angelica I. Aviles-Rivero et al.
-
-Categories: cs.CV, cs.LG
-
-Published: 2026-01-30 18:21 UTC
-
-Source: Arxiv
-
-Summary: Vision-language models suffer performance degradation under domain shift, limiting real-world applicability. Existing test-time adaptation methods are computationally intensive, rely on back-propagation, and often focus on single modalities. To address these issues, we propose Training-free Test-Time Adaptation with Brownian Distance Covariance (TaTa). TaTa leverages Brownian Distance Covariance-a... 
-
-#===================================================#
-
-Why it matters: Paper 2 addresses critical test-time adaptation for Vision Language Models (VLMs), a high-impact area in modern computer vision where real-time performance and robustness are essential. 
-
-Relevance Score: 0.69/1.00
-
-[Read more](http://arxiv.org/abs/2601.23253v1)
-
-#===================================================#
-
-
 Paper: Denoising the Deep Sky: Physics-Based CCD Noise Formation for Astronomical Imaging
 
 Authors: Shuhong Liu, Xining Ge, Ziying Gu et al.
@@ -43,34 +20,34 @@ Summary: Astronomical imaging remains noise-limited under practical observing co
 
 #===================================================#
 
-Why it matters: Paper 3 focuses on astronomical image denoising, a specialized but valid computer vision task that requires advanced signal processing techniques relevant to image analysis. 
+Why it matters: Physics-based denoising for astronomical imaging (cs.CV) uses deep learning for image processing
 
-Relevance Score: 0.69/1.00
+Relevance Score: 0.66/1.00
 
 [Read more](http://arxiv.org/abs/2601.23276v1)
 
 #===================================================#
 
 
-Paper: Structured Over Scale: Learning Spatial Reasoning from Educational Video
+Paper: Training-Free Test-Time Adaptation with Brownian Distance Covariance in Vision-Language Models
 
-Authors: Bishoy Galoaa, Xiangyu Bai, Sarah Ostadabbas
+Authors: Yi Zhang, Chun-Wun Cheng, Angelica I. Aviles-Rivero et al.
 
-Categories: cs.CV
+Categories: cs.CV, cs.LG
 
-Published: 2026-01-30 18:20 UTC
+Published: 2026-01-30 18:21 UTC
 
 Source: Arxiv
 
-Summary: Vision-language models (VLMs) demonstrate impressive performance on standard video understanding benchmarks yet fail systematically on simple reasoning tasks that preschool children can solve, including counting, spatial reasoning, and compositional understanding. We hypothesize that the pedagogically-structured content of educational videos provides an ideal training signal for improving these ca... 
+Summary: Vision-language models suffer performance degradation under domain shift, limiting real-world applicability. Existing test-time adaptation methods are computationally intensive, rely on back-propagation, and often focus on single modalities. To address these issues, we propose Training-free Test-Time Adaptation with Brownian Distance Covariance (TaTa). TaTa leverages Brownian Distance Covariance-a... 
 
 #===================================================#
 
-Why it matters: Paper 4 improves spatial reasoning in video understanding, a core capability for applications like autonomous systems and robotics. 
+Why it matters: Test-time adaptation for vision-language models (cs.CV) addresses domain shift in real-world applications
 
-Relevance Score: 0.69/1.00
+Relevance Score: 0.65/1.00
 
-[Read more](http://arxiv.org/abs/2601.23251v1)
+[Read more](http://arxiv.org/abs/2601.23253v1)
 
 #===================================================#
 
@@ -89,11 +66,34 @@ Summary: Open-set object detection (OSOD) localizes objects while identifying an
 
 #===================================================#
 
-Why it matters: Paper 5 provides practical solutions for object detection in real-world XR environments, addressing challenges in dynamic and uncontrolled settings. 
+Why it matters: Open-set object detection in XR environments (cs.CV) uses deep learning for robust object localization
 
-Relevance Score: 0.68/1.00
+Relevance Score: 0.65/1.00
 
 [Read more](http://arxiv.org/abs/2601.23281v1)
+
+#===================================================#
+
+
+Paper: Structured Over Scale: Learning Spatial Reasoning from Educational Video
+
+Authors: Bishoy Galoaa, Xiangyu Bai, Sarah Ostadabbas
+
+Categories: cs.CV
+
+Published: 2026-01-30 18:20 UTC
+
+Source: Arxiv
+
+Summary: Vision-language models (VLMs) demonstrate impressive performance on standard video understanding benchmarks yet fail systematically on simple reasoning tasks that preschool children can solve, including counting, spatial reasoning, and compositional understanding. We hypothesize that the pedagogically-structured content of educational videos provides an ideal training signal for improving these ca... 
+
+#===================================================#
+
+Why it matters: Spatial reasoning from educational videos (cs.CV) demonstrates deep learning for complex visual tasks
+
+Relevance Score: 0.65/1.00
+
+[Read more](http://arxiv.org/abs/2601.23251v1)
 
 #===================================================#
 
@@ -112,9 +112,9 @@ Summary: While recent video diffusion models (VDMs) produce visually impressive 
 
 #===================================================#
 
-Why it matters: Paper 9 advances 3D-consistent video generation, a key frontier in computer vision with applications in virtual reality, robotics, and augmented reality.
+Why it matters: 3D-consistent video generation (cs.CV) via geometry priors addresses critical challenges in deep computer vision
 
-Relevance Score: 0.63/1.00
+Relevance Score: 0.60/1.00
 
 [Read more](http://arxiv.org/abs/2601.23286v1)
 
@@ -123,25 +123,25 @@ Relevance Score: 0.63/1.00
 Papers similar in chroma_db to 'deep+computer+vision':
 
 1) HVD: Human Vision-Driven Video Representation Learning for Text-Video Retrieval.
-Similarity: 0.6163
+Similarity: 0.5799
 
-2) Training-Free Test-Time Adaptation with Brownian Distance Covariance in Vision-Language Models.
-Similarity: 0.5822
+2) VideoGPA: Distilling Geometry Priors for 3D-Consistent Video Generation.
+Similarity: 0.5682
 
-3) Training-Free Test-Time Adaptation with Brownian Distance Covariance in Vision-Language Models.
-Similarity: 0.5822
+3) VideoGPA: Distilling Geometry Priors for 3D-Consistent Video Generation.
+Similarity: 0.5682
 
-4) Training-Free Test-Time Adaptation with Brownian Distance Covariance in Vision-Language Models.
-Similarity: 0.5822
+4) VideoGPA: Distilling Geometry Priors for 3D-Consistent Video Generation.
+Similarity: 0.5682
 
 #===================================================#
 
 Additional takeaways:
-Trending categories: cs.AI, astro-ph.IM, cs.LG, cs.CV
+Trending categories: cs.AI, cs.LG, cs.CV, astro-ph.IM
 Sources count:arxiv: 5 papers
 
 Most active fields: cs.CV"
 
 #===================================================#          
 
-This post is AI-generated. 2026-02-02 16:30 UTC*
+This post is AI-generated. 2026-02-02 17:38 UTC*
