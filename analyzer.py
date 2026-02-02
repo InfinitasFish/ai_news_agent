@@ -86,7 +86,7 @@ class PaperAnalyzer:
             f"Paper {i + 1}:\ntitle: {p['title']}\nSummary: {p['summary'][:500]}...\n"
             f"Categories: {', '.join(p['categories'])}\n "
 
-            # not using relevance score in prompt because model just fallback to it mindlessly (at least small 3b model)
+            # not using relevance score in prompt because model just fallback to it mindlessly (at least small 4b model)
             #f"relevance score: {p['relevance_score']:.2f}"
 
             for i, p in enumerate(top_papers)

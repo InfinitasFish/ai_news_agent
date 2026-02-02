@@ -58,6 +58,11 @@ class ResearchAgent:
         print("Analyzing papers with LLM...")
         selected_papers = self.analyzer.analyze_with_llm(all_papers, query, top_k=top_k)
 
+        # find sim papers in chroma_db
+        print("Finding similar papers in ChromaDB")
+        similar_papers = self.find_similar_papers(query, n_results=4)
+
+        # TODO: deduplication
         # save found papers to chroma_db
         if self.use_vector_store and selected_papers:
             embeddings = []
@@ -71,7 +76,7 @@ class ResearchAgent:
                 print(f'stored papers in vector database (total: {stored_count})')
 
         print("Generating daily post...")
-        post = self.generator.generate_daily_post(selected_papers, query)
+        post = self.generator.generate_daily_post(selected_papers, similar_papers, query)
 
         result = {
             "total_papers_found": len(all_papers),

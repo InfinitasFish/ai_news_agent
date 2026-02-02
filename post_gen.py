@@ -7,7 +7,7 @@ class PostGenerator:
     """generates post from selected papers"""
 
     @staticmethod
-    def generate_daily_post(papers: List[Dict], query: str = "general research") -> str:
+    def generate_daily_post(papers: List[Dict], similar_db_papers: List[Dict], query: str = "general research") -> str:
         if not papers:
             return "No relevant papers found for today."
 
@@ -25,7 +25,6 @@ class PostGenerator:
                 Categories: {', '.join(paper['categories'][:3])}\n
                 Published: {paper['published_dt'].strftime('%Y-%m-%d %H:%M UTC')}\n
                 Source: {paper['source'].title()}\n
-                
                 Summary: {paper['summary'][:400]}... \n
                 #===================================================#
 
@@ -34,8 +33,17 @@ class PostGenerator:
                 Relevance Score: {paper.get('relevance_score', -1.0):.2f}/1.00
 
                 [Read more]({paper['id']})\n
-                #===================================================#\n\n
+                #===================================================#\n
             """)
+
+        # chromaDB sim papers
+        if similar_db_papers:
+            post += f"Papers similar in chroma_db to '{query}':\n\n"
+            for i, sim_paper in enumerate(similar_db_papers, 1):
+                post += f"{i}) {sim_paper['metadata']['title']}.\nSimilarity: {1 - sim_paper['distance']:.4f}\n\n"
+        else:
+            post += "no similar papers found (vector store might be empty)\n\n"
+        post += textwrap.dedent("#===================================================#\n\n")
 
         # additional info
         post += """Additional takeaways:\n"""

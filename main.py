@@ -1,5 +1,4 @@
 from datetime import datetime
-
 from agent import ResearchAgent
 
 
@@ -27,7 +26,7 @@ def main_search(query):
         query=test_query,
         max_papers_per_source=30,
         top_k=5,
-        hours_back=64,
+        hours_back=128,
         use_semantic_search=True,
     )
 
@@ -40,19 +39,8 @@ def main_search(query):
 
     print("\n" + "*" * 80)
     print("GENERATED POST")
+    #print(results['post'])
     print("*" * 80)
-
-    # rag part
-    print("\n" + "*" * 80)
-    similar_papers = agent.find_similar_papers(test_query, n_results=4)
-    if similar_papers:
-        print(f"papers similar in chroma_db to '{test_query}':")
-        for i, paper in enumerate(similar_papers, 1):
-            print(f"{i}. {paper['metadata']['title']}")
-            print(f"\tsimilarity: {1 - paper['distance']:.4f}")
-            print()
-    else:
-        print('no similar papers found (vector store might be empty)')
 
     # save results
     with open(f"research_digest_{datetime.now().strftime('%Y%m%d')}.md", "w") as f:
