@@ -62,7 +62,6 @@ class ResearchAgent:
         print("Finding similar papers in ChromaDB")
         similar_papers = self.find_similar_papers(query, n_results=4)
 
-        # TODO: deduplication
         # save found papers to chroma_db
         if self.use_vector_store and selected_papers:
             embeddings = []

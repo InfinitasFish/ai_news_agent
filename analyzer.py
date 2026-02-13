@@ -1,6 +1,5 @@
 from typing import List, Dict
 from datetime import datetime
-import json
 import ollama
 import numpy as np
 from pydantic import BaseModel
@@ -121,8 +120,6 @@ class PaperAnalyzer:
 
             # fallback to sort papers by simple relevance
             return top_papers[:top_k]
-
-        response_text = response['message']['content']
 
         # extract json answer
         selected_indices = SelectedPapersFormat.model_validate_json(response['message']['content']).selected_indices

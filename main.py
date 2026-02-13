@@ -26,7 +26,7 @@ def main_search(query):
         query=test_query,
         max_papers_per_source=30,
         top_k=5,
-        hours_back=128,
+        hours_back=64,
         use_semantic_search=True,
     )
 
@@ -43,7 +43,7 @@ def main_search(query):
     print("*" * 80)
 
     # save results
-    with open(f"research_digest_{datetime.now().strftime('%Y%m%d')}.md", "w") as f:
+    with open(f"research_digest_{datetime.now().strftime('%Y%m%d')}.md", "w", encoding="utf-8") as f:
         f.write(results['post'])
 
     print(f"\nResults saved to research_digest_{datetime.now().strftime('%Y%m%d')}.md")
