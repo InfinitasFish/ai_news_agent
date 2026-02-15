@@ -27,7 +27,8 @@ class ResearchAgent:
         torch.manual_seed(seed)
         np.random.seed(seed)
 
-    def run_daily_research(self, query: str = 'llm interpretability', max_papers_per_source: int = 30,
+    # TODO: add search with empty query
+    def run_daily_research(self, query: str = 'llm+interpretability', max_papers_per_source: int = 30,
                            top_k: int = 5, hours_back: int = 24, use_semantic_search: bool = True) -> Dict:
         """ Args:
             query: research query
