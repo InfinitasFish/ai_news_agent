@@ -66,7 +66,7 @@ class PaperAnalyzer:
             # generate embeddings for semantic relevance
             query_embedding = self.embedder.get_embedding(query)
             for paper in papers:
-                paper_text = f"{paper['title']} {paper['summary'][:1000]}"
+                paper_text = f"{paper['title']} {paper['summary']}"
                 paper_embedding = self.embedder.get_embedding(paper_text)
                 semantic_score = self.calculate_semantic_relevance(query_embedding, paper_embedding)
                 # combine with keyword score
@@ -79,69 +79,46 @@ class PaperAnalyzer:
                 paper['relevance_score'] = self.calculate_relevance(paper, query)
 
         sorted_papers = sorted(papers, key=lambda x: x['relevance_score'], reverse=True)
-        top_papers = sorted_papers[:min(top_k * 2, len(sorted_papers))]
+        top_papers = sorted_papers[:min(top_k, len(sorted_papers))]
 
-        papers_context = "\n\n".join([
-            f"Paper {i + 1}:\ntitle: {p['title']}\nSummary: {p['summary'][:500]}...\n"
-            f"Categories: {', '.join(p['categories'])}\n "
+        analyzed_papers = []
+        for paper in top_papers:
+            if not paper.get('full_text'):
+                continue
 
-            # not using relevance score in prompt because model just fallback to it mindlessly (at least small 4b model)
-            #f"relevance score: {p['relevance_score']:.2f}"
+            full_text = paper['full_text'][:13000]
+            prompt = f"""You're a research assistant. Analyze this paper and write concise summaries for each major section you can identify.
 
-            for i, p in enumerate(top_papers)
-        ])
+                Title: {paper['title']}
+                Categories: {', '.join(paper['categories'])}
+                Authors: {', '.join(paper['authors'][:3])}{' et al.' if len(paper['authors']) > 3 else ''}
+    
+                Read through the paper and provide a brief summary of each major section (like Abstract, Introduction, Methods, Results, Discussion, Conclusion - or whatever structure you find).
+    
+                Full text:
+                {full_text}
+            """
 
-        prompt = f"""You're a helpful research assistant, analyze these scientific papers and select the top {top_k} 
-        most relevant to the query: "{query}"
+            try:
+                response = ollama.chat(
+                    model=self.model,
+                    messages=[{'role': 'user', 'content': prompt}],
+                    options={'seed': self.seed, 'temperature': 0.3}
+                )
 
-        Papers:
-        {papers_context}
+                paper['analysis'] = response['message']['content'].strip()
 
-        Instructions:
-            Consider both relevance to query and significance of findings;
-            Prioritize novel or groundbreaking research;
-            Consider paper quality and source reputation;
-            Return JSON with list of selected paper indices (1-based) and brief reasons;
+            except Exception as e:
+                print(f'Error analyzing paper {paper["title"][:50]}...: {e}')
+                paper['analysis'] = "Analysis failed due to something"
+                paper['analysis_error'] = str(e)
 
-        Answer in specified json format, e.g. {{"selected_indices": [1, 3, 5], "reasons": ["reason1", "reason2", ...]}}
-        """
+            analyzed_papers.append(paper)
 
-        try:
-            response = ollama.chat(
-                model=self.model,
-                messages=[{'role': 'user', 'content': prompt}],
-                options={'seed': self.seed, 'temperature': 0.3},
-                format=SelectedPapersFormat.model_json_schema()
-            )
-        except Exception as e:
-            if hasattr(e, 'message'): msg = e.message
-            else: msg = e
-            print(f'Error from .chat(), model: {self.model}\n {msg} ')
-
-            # fallback to sort papers by simple relevance
-            return top_papers[:top_k]
-
-        # extract json answer
-        selected_indices = SelectedPapersFormat.model_validate_json(response['message']['content']).selected_indices
-        reasons = SelectedPapersFormat.model_validate_json(response['message']['content']).reasons
-        # successful extraction
-        if selected_indices and reasons and len(selected_indices) == len(reasons):
-            # get 0-based indices and select papers
-            selected_papers = []
-            # костыль чтобы сметчить индексы пейперов и лист причин
-            for reason_idx, paper_idx in enumerate(selected_indices[:top_k]):
-                if 0 < paper_idx <= len(top_papers):
-                    paper = top_papers[paper_idx - 1].copy()
-                    reason = reasons[reason_idx]
-                    paper['selection_reason'] = reason
-                    selected_papers.append(paper)
-
-            return selected_papers
-
-        # fallback to sort papers by simple relevance
-        return top_papers[:top_k]
+        return analyzed_papers
 
 
+# deprecated (
 class SelectedPapersFormat(BaseModel):
     selected_indices: List[int]
     reasons: List[str]

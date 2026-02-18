@@ -24,9 +24,9 @@ def main_search(query):
 
     results = agent.run_daily_research(
         query=test_query,
-        max_papers_per_source=30,
+        max_papers_per_source=10,
         top_k=5,
-        hours_back=64,
+        hours_back=32,
         use_semantic_search=True,
     )
 

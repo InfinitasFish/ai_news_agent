@@ -1,7 +1,7 @@
 from typing import List, Dict
 from datetime import datetime
-import textwrap
 
+SECTION_DELIMITER = '#===================================================#\n\n'
 
 class PostGenerator:
     """generates post from selected papers"""
@@ -11,42 +11,40 @@ class PostGenerator:
         if not papers:
             return "No relevant papers found for today."
 
-        post = textwrap.dedent(f"""
-            ### Daily Research: {datetime.now().strftime('%Y-%m-%d')}
-            ### Query: "{query}"
-            ### Found *{len(papers)}* relevant papers.
-            #===================================================#\n\n
-        """)
+        post = f"""### Daily Research: {datetime.now().strftime('%Y-%m-%d')}
+### Query: "{query}"
+### Found *{len(papers)}* relevant papers.
+{SECTION_DELIMITER}           
+"""
 
         for i, paper in enumerate(papers, 1):
-            post += textwrap.dedent(f"""
-                Paper: {paper['title']}\n
-                Authors: {', '.join(paper['authors'][:3])}{' et al.' if len(paper['authors']) > 3 else ''}\n
-                Categories: {', '.join(paper['categories'][:3])}\n
-                Published: {paper['published_dt'].strftime('%Y-%m-%d %H:%M UTC')}\n
-                Source: {paper['source'].title()}\n
-                Summary: {paper['summary'][:400]}... \n
-                #===================================================#
-
-                Why it matters: {paper.get('selection_reason', 'error retrieving reason')}
-                
-                Relevance Score: {paper.get('relevance_score', -1.0):.2f}/1.00
-
-                [Read more]({paper['id']})\n
-                #===================================================#\n
-            """)
+            post += f"""
+Paper: {paper['title']}
+Authors: {', '.join(paper['authors'][:3])}{' et al.' if len(paper['authors']) > 3 else ''}
+Categories: {', '.join(paper['categories'][:3])}
+Published: {paper['published_dt'].strftime('%Y-%m-%d %H:%M UTC')}
+Source: {paper['source'].title()}
+            
+Relevance Score: {paper.get('relevance_score', -1.0):.3f}/1.00
+            
+Llm analysis: {paper.get('analysis', '')}
+            
+[Read full paper]({paper['id']})
+{SECTION_DELIMITER}
+"""
 
         # chromaDB sim papers
         if similar_db_papers:
-            post += f"Papers similar in chroma_db to '{query}':\n\n"
+            post += f"\nPapers similar in chroma_db to '{query}':\n\n"
             for i, sim_paper in enumerate(similar_db_papers, 1):
                 post += f"{i}) {sim_paper['metadata']['title']}.\nSimilarity: {1 - sim_paper['distance']:.4f}\n\n"
         else:
-            post += "no similar papers found (vector store might be empty)\n\n"
-        post += textwrap.dedent("#===================================================#\n\n")
+            post += "\nno similar papers found (vector store might be empty)\n\n"
+
+        post += f"{SECTION_DELIMITER}\n\n"
 
         # additional info
-        post += """Additional takeaways:\n"""
+        post += "Additional takeaways:\n"
         topics = set()
         for paper in papers:
             topics.update(paper['categories'][:2])
@@ -56,15 +54,15 @@ class PostGenerator:
         for paper in papers:
             sources[paper['source']] = sources.get(paper['source'], 0) + 1
 
-        post += f"Sources count:" + ", ".join([f"{k}: {v} papers" for k, v in sources.items()]) + "\n"
+        post += "Sources count: " + ", ".join([f"{k}: {v} papers" for k, v in sources.items()]) + "\n"
 
-        post += textwrap.dedent(f"""
-                    Most active fields: {max(set([p['categories'][0] for p in papers if p['categories']]), 
-                                           key=[p['categories'][0] for p in papers if p['categories']].count)}"
+        # Most active field
+        if papers and any(p.get('categories') for p in papers):
+            all_cats = [p['categories'][0] for p in papers if p.get('categories')]
+            if all_cats:
+                most_active = max(set(all_cats), key=all_cats.count)
+                post += f"\nMost active fields: {most_active}\n"
 
-                    #===================================================#          
-                    
-                    This post is AI-generated. {datetime.now().strftime('%Y-%m-%d %H:%M UTC')}*
-                """)
+        post += f"\nThis post is AI-generated. {datetime.now().strftime('%Y-%m-%d %H:%M UTC')}*"
 
         return post

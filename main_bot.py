@@ -10,6 +10,10 @@ from telegram.ext import ApplicationBuilder, ContextTypes, CommandHandler
 from dotenv import load_dotenv
 
 from agent import ResearchAgent
+from post_gen import SECTION_DELIMITER
+
+
+CHUNK_SIZE = 1900
 
 
 def split_post_by_chunks(full_post: str, chunk_size: int) -> List[str]:
@@ -18,6 +22,10 @@ def split_post_by_chunks(full_post: str, chunk_size: int) -> List[str]:
     for i in range(chunk_count):
         chunks.append(full_post[i * chunk_size:(i + 1) * chunk_size])
     return chunks
+
+
+def split_post_by_delimiter(full_post, delimiter=SECTION_DELIMITER):
+    return [chunk.strip() for chunk in full_post.split(SECTION_DELIMITER)]
 
 
 logging.basicConfig(
@@ -58,7 +66,7 @@ async def search_arxiv_last_n_by_query(update: Update, context: ContextTypes.DEF
     results = agent.run_daily_research(
         query=query,
         hours_back=n_hours,
-        max_papers_per_source=30,
+        max_papers_per_source=10,
         top_k=5,
         use_semantic_search=True,
     )
@@ -67,9 +75,12 @@ async def search_arxiv_last_n_by_query(update: Update, context: ContextTypes.DEF
         await context.bot.send_message(chat_id=update.effective_chat.id, text='No papers were found, try different query or bigger n_hours')
         return
     post = results['post']
-    post_chunks = split_post_by_chunks(post, chunk_size=1900)
-    print(len(post), len(post_chunks))
-    for chunk in post_chunks:
+    post_sections = split_post_by_delimiter(post)
+    post_sections_chunks = []
+    for section in post_sections:
+        post_sections_chunks.extend(split_post_by_chunks(section))
+    print(len(post), len(post_sections), len(post_sections_chunks))
+    for chunk in post_sections_chunks:
         await context.bot.send_message(chat_id=update.effective_chat.id, text=chunk)
 
 
