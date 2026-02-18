@@ -2,12 +2,22 @@
 
 import logging
 import os
+from typing import List
+import textwrap
 
 from telegram import Update
 from telegram.ext import ApplicationBuilder, ContextTypes, CommandHandler
 from dotenv import load_dotenv
 
 from agent import ResearchAgent
+
+
+def split_post_by_chunks(full_post: str, chunk_size: int) -> List[str]:
+    chunks = []
+    chunk_count = len(full_post) // chunk_size
+    for i in range(chunk_count):
+        chunks.append(full_post[i * chunk_size:(i + 1) * chunk_size])
+    return chunks
 
 
 logging.basicConfig(
@@ -17,16 +27,26 @@ logging.basicConfig(
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await context.bot.send_message(chat_id=update.effective_chat.id, text="I'm a bot, please talk to me!")
+    start_message = textwrap.dedent("""
+        This bot parses arXiv papers that were published for the last N hours given the query.
+        
+        Usage: /search_arxiv query n_hours
+        """)
+
+    await context.bot.send_message(chat_id=update.effective_chat.id, text=start_message)
 
 
 # bot accepts n_hours and query for search
 async def search_arxiv_last_n_by_query(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # args are passed automatically, then split by using whitespace
     # print(context.args)
-
-    n_hours = context.args[-1]
-    query = '+'.join(context.args[:-1])
+    await context.bot.send_message(chat_id=update.effective_chat.id, text=f'Searching in progress...')
+    try:
+        n_hours = int(context.args[-1])
+        query = '+'.join(context.args[:-1])
+    except Exception as e:
+        await context.bot.send_message(chat_id=update.effective_chat.id, text=f'Invalid arguments in /search_arxiv : {e}')
+        return
 
     agent = ResearchAgent(
         model='qwen3:4b',
@@ -37,13 +57,20 @@ async def search_arxiv_last_n_by_query(update: Update, context: ContextTypes.DEF
 
     results = agent.run_daily_research(
         query=query,
-        hours_back=int(n_hours),
+        hours_back=n_hours,
         max_papers_per_source=30,
         top_k=5,
         use_semantic_search=True,
     )
 
-    await context.bot.send_message(chat_id=update.effective_chat.id, text=results['post'])
+    if results['total_papers_found'] == 0:
+        await context.bot.send_message(chat_id=update.effective_chat.id, text='No papers were found, try different query or bigger n_hours')
+        return
+    post = results['post']
+    post_chunks = split_post_by_chunks(post, chunk_size=1900)
+    print(len(post), len(post_chunks))
+    for chunk in post_chunks:
+        await context.bot.send_message(chat_id=update.effective_chat.id, text=chunk)
 
 
 if __name__ == '__main__':
