@@ -7,7 +7,7 @@ class PostGenerator:
     """generates post from selected papers"""
 
     @staticmethod
-    def generate_daily_post(papers: List[Dict], similar_db_papers: List[Dict], query: str = "general research") -> str:
+    def generate_daily_post(papers: List[Dict], similar_db_papers: List[Dict], query: str = "llm") -> str:
         if not papers:
             return "No relevant papers found for today."
 
@@ -20,9 +20,13 @@ class PostGenerator:
         for i, paper in enumerate(papers, 1):
             post += f"""
 Paper: {paper['title']}
+
 Authors: {', '.join(paper['authors'][:3])}{' et al.' if len(paper['authors']) > 3 else ''}
+
 Categories: {', '.join(paper['categories'][:3])}
+
 Published: {paper['published_dt'].strftime('%Y-%m-%d %H:%M UTC')}
+
 Source: {paper['source'].title()}
             
 Relevance Score: {paper.get('relevance_score', -1.0):.3f}/1.00
@@ -30,6 +34,7 @@ Relevance Score: {paper.get('relevance_score', -1.0):.3f}/1.00
 Llm analysis: {paper.get('analysis', '')}
             
 [Read full paper]({paper['id']})
+
 {SECTION_DELIMITER}
 """
 
