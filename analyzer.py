@@ -50,6 +50,26 @@ class PaperAnalyzer:
         similarity = np.dot(query_embedding, paper_embedding) / (query_norm * paper_norm)
         return (similarity + 1) / 2
 
+    def get_llm_relevance(self, paper: Dict, query: str) -> float:
+        prompt = f"""Given the query for searching paper and paper's summary, give an float estimate how well query is
+            related to the given paper in range from [0.0 to 1.0]. Answer in a single float string, which HAVE to be natively 
+            convertable to float, like float(estimate).
+            
+            Query: {query}
+            Paper summary: {paper['title']} {paper['summary']}
+            """
+        response = ollama.chat(
+            model=self.model,
+            messages=[{'role': 'user', 'content': prompt}],
+            options={'seed': self.seed, 'temperature': 0.3}
+        )
+        try:
+            relevance = float(response['message']['content'])
+            return relevance
+        except Exception as e:
+            print(f'Error in get_llm_relevance(): {e}')
+            return 0.5
+
 
     def analyze_with_llm(self, papers: List[Dict], query: str, top_k: int = 10,
                          use_semantic: bool = True) -> List[Dict]:
@@ -69,10 +89,10 @@ class PaperAnalyzer:
                 paper_text = f"{paper['title']} {paper['summary']}"
                 paper_embedding = self.embedder.get_embedding(paper_text)
                 semantic_score = self.calculate_semantic_relevance(query_embedding, paper_embedding)
-                # combine with keyword score
                 keyword_score = self.calculate_relevance(paper, query)
+                llm_score = self.get_llm_relevance(paper, query)
                 # magic weights for scores
-                paper['relevance_score'] = 0.8 * semantic_score + 0.2 * keyword_score
+                paper['relevance_score'] = 0.6 * llm_score + 0.25 * semantic_score + 0.15 * keyword_score
                 paper['embedding'] = paper_embedding
         else:
             for paper in papers:
@@ -87,7 +107,8 @@ class PaperAnalyzer:
                 continue
 
             full_text = paper['full_text'][:13000]
-            prompt = f"""You're a research assistant. Analyze this paper and write concise summaries for each major section you can identify.
+            prompt = f"""You're a research assistant. Analyze this paper and write concise summaries for each major section you can identify. 
+                Dont use markdown in your answer, only plain text.    
 
                 Title: {paper['title']}
                 Categories: {', '.join(paper['categories'])}

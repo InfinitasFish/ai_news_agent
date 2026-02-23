@@ -74,7 +74,7 @@ async def search_arxiv_last_n_by_query(update: Update, context: ContextTypes.DEF
         await context.bot.send_message(chat_id=update.effective_chat.id, text=f'An error occurred: {e}; Try different query or parameters...')
         return
 
-    if results['total_papers_found'] == 0:
+    if not results['total_papers_found']:
         await context.bot.send_message(chat_id=update.effective_chat.id, text='No papers were found, try different query or bigger n_hours')
         return
     post = results['post']
